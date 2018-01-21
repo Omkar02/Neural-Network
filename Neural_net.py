@@ -19,7 +19,7 @@ with open('CHAR_IMG_flat.pkl', 'rb') as f:
     X= pickle.load(f)
 print('X_shape = ',X.shape)
 Y = lable
-X, testX, Y, testY = train_test_split(X, Y, test_size=0.3)
+X, testX, Y, testY = train_test_split(X, Y, test_size = 0.3, random_state = 5)
 X = np.reshape(X,[-1, 28, 28, 1])
 testX, testY = shuffle(testX, testY)
 testX = np.reshape(testX,[-1, 28, 28, 1])
