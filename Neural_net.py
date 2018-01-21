@@ -17,33 +17,29 @@ from PIL import Image
 #******************* Data loading and preprocessing*********************************************************************
 with open('CHAR_IMG_flat.pkl', 'rb') as f:
     X= pickle.load(f)
-print(X)
+print('X_shape = ',X.shape)
 Y = lable
-print(Y)
-X, Y = shuffle(X, Y)
-X, testX, Y, testY = train_test_split(X, Y, test_size=0.3, random_state=0)
+X, testX, Y, testY = train_test_split(X, Y, test_size=0.3)
 X = np.reshape(X,[-1, 28, 28, 1])
 testX, testY = shuffle(testX, testY)
 testX = np.reshape(testX,[-1, 28, 28, 1])
 #******************* Network *******************************************************************************************
 network = input_data(shape=[None, 28, 28, 1], name='input')
-network = conv_2d(network, 32, 3, activation='relu', regularizer="L2")
+network = conv_2d(network, 32, 2, activation='relu', regularizer="L2")
 network = max_pool_2d(network, 2)
 network = local_response_normalization(network)
-network = conv_2d(network, 64, 3, activation='relu', regularizer="L2")
+network = conv_2d(network, 64, 2, activation='relu', regularizer="L2")
 network = max_pool_2d(network, 2)
 network = local_response_normalization(network)
-network = fully_connected(network, 128, activation='tanh')
-network = dropout(network, 0.2)
-network = fully_connected(network, 256, activation='tanh')
-network = dropout(network, 0.2)
+network = fully_connected(network, 1024, activation='softmax')
+network = dropout(network, 0.8)
 network = fully_connected(network, 36, activation='softmax')
-network = regression(network, optimizer='adam', learning_rate=0.1,
+network = regression(network, optimizer='adam', learning_rate=0.01,
                      loss='categorical_crossentropy', name='target')
 
 #******************* Training ******************************************************************************************
 model = tflearn.DNN(network, tensorboard_verbose=3)
-model.fit({'input': X}, {'target': Y}, n_epoch=60,
+model.fit({'input': X}, {'target': Y}, n_epoch=20,
            validation_set=({'input': testX}, {'target': testY}),
            snapshot_step=1000, show_metric=True, run_id='Some_detection_needed!')
 
@@ -57,5 +53,5 @@ model.save('model.tflearn')
 #     img = np.reshape(img, (-1,28, 28, 1))
 #     pre = model.predict(img)
 #     print('Value = ',pre)
-# 
+#
 #     print('**************')
